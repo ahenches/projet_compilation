@@ -1,2 +1,2 @@
 DetMin: main.c 
-	gcc main.c -o $@ 
+	gcc -Wall main.c -o $@ 

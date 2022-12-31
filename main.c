@@ -4,24 +4,26 @@
 
 #include "./automate.h"
 
-
-// int executer_automate(char chaine[], i); //return 1 si mot valide 
-
 int main( int argc, char *argv[ ] )
 {
-    FILE* ptr;	
-	char line[MAX_CHAR_BY_LINE];
+    FILE *ptr;
+	long save;	
+	char line[MAX_CARACTERE_PAR_LIGNE];
 	
+	// INITIALIZE AFN	
+	afn afn1 = {0};
+	// initializing array elements
+    for (int i = 0; i < CARACTERES_IMPRIMABLES; i++)
+		afn1.correspondance[i] = -1;
 	// LECTURE FICHIER
-	afn afn1;
-   	ptr = fopen(argv[1], "r");
+	ptr = fopen(argv[1], "r");
  	// lecture du nombre d'états
 	int nombre_etats;
 
     if (NULL == ptr) {
         printf("file can't be opened \n");
     }	
-	fgets(line, MAX_CHAR_BY_LINE, ptr);
+	fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr);
 	nombre_etats = atoi(line);
 	printf("Nombre d'états : %d\n",nombre_etats); 
 
@@ -32,7 +34,7 @@ int main( int argc, char *argv[ ] )
 
 
 	// Lecture du nombre d'états finals	
-	fgets(line, MAX_CHAR_BY_LINE, ptr);
+	fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr);
 	char delim[] = " ";
 	char *res = strtok(line, delim);
 	int i = 0;
@@ -51,30 +53,55 @@ int main( int argc, char *argv[ ] )
 			printf("%d est final\n", i);
 		else
 			printf("%d n'est pas final\n", i);
-	} TESTED
+	} //TESTED
 	*/
 	
 	// Lecture des transitions
-	i = 0;
-	while(fgets(line, MAX_CHAR_BY_LINE, ptr) != NULL)
+	save = ftell(ptr);
+	int indice_tableau_lettres = 0;
+	while(fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr) != NULL)
 	{
 		res = strtok(line, delim);
-		afn1.transitions[i].etat_depart = atoi(res); 
 		res = strtok(NULL, delim);
-		afn1.transitions[i].lettre = *res; // normalement chaine de caractère composée d'un seul caractère 
-		res = strtok(NULL, delim);
-		afn1.transitions[i].etat_fin = atoi(res); 
-		i++;
+		if (afn1.correspondance[*res-' '] == -1)
+		{
+			afn1.correspondance[*res-' '] = indice_tableau_lettres++;
+		}
 	}
-	afn1.nombre_transitions = i;
-	fclose(ptr);
 	/*
-	for(int i = 0; i < afn1.nombre_transitions; i++)
-	{
-		printf("%d :: etat depart : %d, lettre : %c, etat fin : %d est final\n", i, afn1.transitions[i].etat_depart, afn1.transitions[i].lettre, afn1.transitions[i].etat_fin);
-	} TESTED
+	for(int i = 0; i < 95; i++)
+		printf("le car ascii : %c la valeur : %d\n", i+' ', afn1.correspondance[i]); // TESTED
 	*/
-	
+	fseek(ptr, save, SEEK_SET);
+
+	i = 0;
+	etats_N_det * tableau_de_etats_N_det_de_taille_nombre_etats[nombre_etats];
+	for (int i = 0; i < nombre_etats; i++)
+	{
+		tableau_de_etats_N_det_de_taille_nombre_etats[i] = calloc(indice_tableau_lettres, sizeof(etats_N_det)); 
+	}
+	afn1.etats_transitions = tableau_de_etats_N_det_de_taille_nombre_etats;
+	int etat_d, etat_f, indice_lettre, indice_etat_f;
+	while(fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr) != NULL)
+	{
+		etat_d = atoi(strtok(line, delim));
+		res = strtok(NULL, delim);
+		etat_f = atoi(strtok(NULL, delim));
+		indice_lettre = afn1.correspondance[*res - ' '];
+		indice_etat_f = afn1.etats_transitions[etat_d][indice_lettre].taille_etats_N_det++;
+		afn1.etats_transitions[etat_d][indice_lettre].etats[indice_etat_f] = etat_f;
+	}
+	fclose(ptr);
+	/*		
+	for(int i = 0; i < afn1.nombre_etats; i++)
+	{
+		printf("Ah %d ", i);
+		for (int j = 0; j < indice_tableau_lettres; j++)
+			for (int k = 0; k < afn1.etats_transitions[i][j].taille_etats_N_det; k++)
+				printf("etat depart : %d, lettre : %c, etat fin : %d est final\n", i, j+32, afn1.etats_transitions[i][j].etats[k]);
+	} // TESTED
+	*/ 
+
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afn
@@ -108,12 +135,9 @@ char executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int pro
 	}
 	else {
 		int mot_restant_valide = 0;
-		for (int i = 0; i < afn->nombre_transitions; i++)
+		for (int i = 0; i < afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].taille_etats_N_det; i++)
 		{
-			if (afn->transitions[i].etat_depart == etat_actuel && afn->transitions[i].lettre == *chaine_restante)
-				mot_restant_valide = mot_restant_valide | executer_AFN_rec(afn->transitions[i].etat_fin, &chaine_restante[1], afn, profondeur+1);
-			//else 
-				//printf("la transition : %d n'existe pas avec pour état %d et comme lettre %c\n", i, etat_actuel, *chaine_restante);
+			mot_restant_valide = mot_restant_valide | executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, profondeur+1);
 		}
 		return mot_restant_valide;
 	}

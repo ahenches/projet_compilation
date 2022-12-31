@@ -17,5 +17,17 @@ typedef struct AFN {
 	int nombre_etats;
 } afn;
 
+
+typedef struct AFD{
+    char caracteresRencontres[NB_CARACTERE_MAX +1];
+    int nbEtats;
+    int *etats;
+    int **transitions;
+}AFD;
+
 char executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int profondeur); // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
 afn genererAFN(char *file_name);
+AFD nouveauAFD(int nbEtats);
+void afficherAFD(AFD *afd);
+int executer_AFN_rec(int etat_actuel, char chaine_restante[], AFD *afd, int profondeur); // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
+

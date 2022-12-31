@@ -73,10 +73,8 @@ afn genererAFN(char *filename)
 	nombre_etats = atoi(line);
 	printf("Nombre d'états : %d\n",nombre_etats); 
 
-	char tableau_de_char_de_taille_nombre_etats[nombre_etats];
-
 	afn1.nombre_etats = nombre_etats;
-	afn1.sont_etats_finals = tableau_de_char_de_taille_nombre_etats;
+	afn1.sont_etats_finals = calloc(nombre_etats, sizeof(char));
 
 
 	// Lecture du nombre d'états finals	
@@ -106,12 +104,11 @@ afn genererAFN(char *filename)
 	fseek(ptr, save, SEEK_SET);
 
 	i = 0;
-	etats_N_det * tableau_de_etats_N_det_de_taille_nombre_etats[nombre_etats];
+	afn1.etats_transitions = malloc(nombre_etats * sizeof(etats_N_det *)); 
 	for (int i = 0; i < nombre_etats; i++)
 	{
-		tableau_de_etats_N_det_de_taille_nombre_etats[i] = calloc(indice_tableau_lettres, sizeof(etats_N_det)); 
+		afn1.etats_transitions[i] = calloc(indice_tableau_lettres, sizeof(etats_N_det)); 
 	}
-	afn1.etats_transitions = tableau_de_etats_N_det_de_taille_nombre_etats;
 	int etat_d, etat_f, indice_lettre, indice_etat_f;
 	while(fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr) != NULL)
 	{

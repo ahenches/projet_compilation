@@ -208,7 +208,7 @@ void afficherAFD(AFD *afd)
 
 
 
-int executer_AFN_rec(int etat_actuel, char chaine_restante[], AFD *afd, int profondeur)
+int executer_AFD_rec(int etat_actuel, char chaine_restante[], AFD *afd, int profondeur)
 {
     printf("(%d, %s) |-\t", etat_actuel, chaine_restante);
 
@@ -224,7 +224,7 @@ int executer_AFN_rec(int etat_actuel, char chaine_restante[], AFD *afd, int prof
         }
         else
         {
-            return executer_AFN_rec(afd->transitions[etat_actuel][*chaine_restante-' '], &chaine_restante[1], afd, profondeur+1);
+            return executer_AFD_rec(afd->transitions[etat_actuel][*chaine_restante-' '], &chaine_restante[1], afd, profondeur+1);
         }
     }
 }

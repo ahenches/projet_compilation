@@ -13,7 +13,7 @@ int main( int argc, char *argv[ ] )
 	{
 		// parcours de l'afn
 		printf("%s\n", argv[i]);
-		if (executer_AFN_rec(0, argv[i], &afn_, 0))
+		if (executer_AFN_rec(0, argv[i], &afn_, -3))
 			printf("Mot Valide !\n");
 		else
 			printf("Mot NON Valide !\n");
@@ -26,7 +26,7 @@ int main( int argc, char *argv[ ] )
 	// minimalisation
 	for(int i = 2; i < argc; i++)
 	{
-		// parcours de l'afd réduit
+		// parcours de l'afd réduit 
 	}
 	///////////////////////Test AFD///////////////////////////
 	afd afd = nouveauAFD(3);
@@ -53,23 +53,6 @@ int main( int argc, char *argv[ ] )
 	//////////////////////////////////////////////////////////////////////////
 
 	return 0;
-}
-
-bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int profondeur) // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
-{
-	printf("%d, état : %d mot restante à lire : %s\n", profondeur, etat_actuel, chaine_restante);
-	if (*chaine_restante == '\0')
-	{
-		return afn->sont_etats_finals[etat_actuel]; // renvoie Vrai si état_actuel est final Faux sinon
-	}
-	else {
-		int mot_restant_valide = 0;
-		for (int i = 0; i < afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].nombre_etats_N_det; i++)
-		{
-			mot_restant_valide = mot_restant_valide | executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, profondeur+1);
-		}
-		return mot_restant_valide;
-	}
 }
 
 afn genererAFN(char *filename)
@@ -146,6 +129,41 @@ afn genererAFN(char *filename)
 	return afn1;
 }
 
+int compter_digit(long long n)
+{
+	if (n/10 == 0)
+		return 1;
+	return 1 + compter_digit(n / 10);
+}
+ 
+
+bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int taille_retrait) // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
+{
+	printf("(%d, %s)", etat_actuel, chaine_restante);
+	if (*chaine_restante == '\0')
+	{
+		printf(afn->sont_etats_finals[etat_actuel] ? "|- ok" : "|- ko");
+		printf("\n");
+		return afn->sont_etats_finals[etat_actuel]; // renvoie Vrai si état_actuel est final Faux sinon
+	}
+	else {
+		bool mot_restant_valide = 0;
+		taille_retrait += compter_digit(etat_actuel) + strlen(chaine_restante) + 7;
+		int i = 0;
+		while(i < afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].nombre_etats_N_det && !mot_restant_valide)
+		{
+			if (i > 0)
+				for (int j = 0; j < taille_retrait; j++)
+					printf(" ");
+			printf("|- ");
+			mot_restant_valide = mot_restant_valide |  executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, taille_retrait);
+			i++;
+		}
+		if (afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].nombre_etats_N_det == 0)
+			 printf("|- ko \n");
+		return mot_restant_valide;
+	}
+}
 
 afd nouveauAFD(int nbEtats)
 {

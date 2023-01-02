@@ -1,2 +1,5 @@
+flags=-Wall -g
+
+
 DetMin: main.c 
-	gcc -Wall -g main.c -o $@ 
+	gcc $(flags) $^ -o $@

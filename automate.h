@@ -13,7 +13,7 @@ typedef struct Etats_N_det {
 
 typedef struct Alphabet {
 	int nombre_lettres;
-	char * lettres;
+	char lettres[];
 } alphabet;
 
 typedef struct AFN {
@@ -24,11 +24,12 @@ typedef struct AFN {
 	alphabet alphabet;
 } afn;
 
-typedef struct AFD{
-    char caracteresRencontres[CARACTERES_IMPRIMABLES +1];
+typedef struct AFD {
+    char caracteresRencontres[CARACTERES_IMPRIMABLES +1]; // je sais pas si t'as besoin de ça du coup
     int nbEtats;
     bool *etats;
     int **transitions;
+	alphabet alphabet
 }afd;
 
 afn genererAFN(char *file_name);

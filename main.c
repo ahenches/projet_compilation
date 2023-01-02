@@ -69,12 +69,12 @@ afn genererAFN(char *filename)
 		afn1.correspondance[i] = -1;
 	// LECTURE FICHIER
 	ptr = fopen(filename, "r");
-	// lecture du nombre d'états
-	int nombre_etats;
-
 	if (NULL == ptr) {
 		printf("file can't be opened \n");
 	}	
+	
+	// lecture du nombre d'états
+	int nombre_etats;
 	fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr);
 	nombre_etats = atoi(line);
 	printf("Nombre d'états : %d\n",nombre_etats); 
@@ -97,23 +97,31 @@ afn genererAFN(char *filename)
 	
 	// Lecture des transitions
 	save = ftell(ptr);
-	int indice_tableau_lettres = 0;
+	// premier parcours pour connaître le nombre de lettre dans l'alphabet
+	afn1.alphabet.nombre_lettres = 0;
 	while(fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr) != NULL)
 	{
 		res = strtok(line, delim);
 		res = strtok(NULL, delim);
 		if (afn1.correspondance[*res-' '] == -1)
 		{
-			afn1.correspondance[*res-' '] = indice_tableau_lettres++;
+			afn1.alphabet.lettres[afn1.alphabet.nombre_lettres] = *res;
+			afn1.correspondance[*res-' '] = afn1.alphabet.nombre_lettres++;
 		}
 	}
 	fseek(ptr, save, SEEK_SET);
-
+	
+	for(int i = 0; i < afn1.alphabet.nombre_lettres; i++)
+	{
+		printf("%de lettre : %c\n", i, afn1.alphabet.lettres[i]);
+	}
+	
+	// deuxième parcours pour remplir le tableau des transitions à deux entrées (etat, lettre)
 	i = 0;
 	afn1.etats_transitions = malloc(nombre_etats * sizeof(etats_N_det *)); 
 	for (int i = 0; i < nombre_etats; i++)
 	{
-		afn1.etats_transitions[i] = calloc(indice_tableau_lettres, sizeof(etats_N_det)); 
+		afn1.etats_transitions[i] = calloc(afn1.alphabet.nombre_lettres, sizeof(etats_N_det)); 
 	}
 	int etat_d, etat_f, indice_lettre, indice_etat_f;
 	while(fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr) != NULL)
@@ -129,6 +137,11 @@ afn genererAFN(char *filename)
 	return afn1;
 }
 
+void afficher_n_fois(char * str, int n_fois)
+{
+	for (int j = 0; j < n_fois; j++)
+		printf("%s", str);
+}
 int compter_digit(long long n)
 {
 	if (n/10 == 0)
@@ -153,8 +166,7 @@ bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int tai
 		while(i < afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].nombre_etats_N_det && !mot_restant_valide)
 		{
 			if (i > 0)
-				for (int j = 0; j < taille_retrait; j++)
-					printf(" ");
+				afficher_n_fois(" ", taille_retrait);
 			printf("|- ");
 			mot_restant_valide = mot_restant_valide |  executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, taille_retrait);
 			i++;

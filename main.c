@@ -4,6 +4,7 @@
 
 #include "./automate.h"
 
+
 int main( int argc, char *argv[ ] )
 {
 	afn afn_ = genererAFN(argv[1]);	
@@ -28,7 +29,7 @@ int main( int argc, char *argv[ ] )
 		// parcours de l'afd réduit
 	}
 	///////////////////////Test AFD///////////////////////////
-	AFD afd = nouveauAFD(3);
+	afd afd = nouveauAFD(3);
     
     afd.etats[0] = 1;
     afd.etats[1] = 1;
@@ -43,7 +44,7 @@ int main( int argc, char *argv[ ] )
     afd.transitions[2]['b'-' '] = 2;
 
     afficherAFD(&afd);
-    if(executer_AFN_rec(0, "aaa", &afd, 0)){
+    if(executer_AFD_rec(0, "aaa", &afd, 0)){
         printf("ok\n");
     }
     else{
@@ -54,7 +55,7 @@ int main( int argc, char *argv[ ] )
 	return 0;
 }
 
-char executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int profondeur) // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
+bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int profondeur) // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
 {
 	printf("%d, état : %d mot restante à lire : %s\n", profondeur, etat_actuel, chaine_restante);
 	if (*chaine_restante == '\0')
@@ -63,7 +64,7 @@ char executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int pro
 	}
 	else {
 		int mot_restant_valide = 0;
-		for (int i = 0; i < afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].taille_etats_N_det; i++)
+		for (int i = 0; i < afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].nombre_etats_N_det; i++)
 		{
 			mot_restant_valide = mot_restant_valide | executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, profondeur+1);
 		}
@@ -138,7 +139,7 @@ afn genererAFN(char *filename)
 		res = strtok(NULL, delim);
 		etat_f = atoi(strtok(NULL, delim));
 		indice_lettre = afn1.correspondance[*res - ' '];
-		indice_etat_f = afn1.etats_transitions[etat_d][indice_lettre].taille_etats_N_det++;
+		indice_etat_f = afn1.etats_transitions[etat_d][indice_lettre].nombre_etats_N_det++;
 		afn1.etats_transitions[etat_d][indice_lettre].etats[indice_etat_f] = etat_f;
 	}
 	fclose(ptr);
@@ -146,12 +147,12 @@ afn genererAFN(char *filename)
 }
 
 
-AFD nouveauAFD(int nbEtats)
+afd nouveauAFD(int nbEtats)
 {
-    AFD afd;
+    afd afd;
 
     afd.nbEtats = nbEtats;
-    afd.etats = (int*)malloc(nbEtats*sizeof(int));
+    afd.etats = (bool *)malloc(nbEtats*sizeof(bool));
     afd.transitions =  (int**)malloc(nbEtats*sizeof(int*));
     for(int i = 0; i < nbEtats; i++)
     {
@@ -170,7 +171,7 @@ AFD nouveauAFD(int nbEtats)
 }
 
 
-void afficherAFD(AFD *afd)
+void afficherAFD(afd *afd)
 {
     char caractereRecontre;
     int i, nbCaracteresRencontres;
@@ -208,7 +209,7 @@ void afficherAFD(AFD *afd)
 
 
 
-int executer_AFD_rec(int etat_actuel, char chaine_restante[], AFD *afd, int profondeur)
+bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int profondeur)
 {
     printf("(%d, %s) |-\t", etat_actuel, chaine_restante);
 

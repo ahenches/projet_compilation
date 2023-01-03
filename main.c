@@ -4,7 +4,6 @@
 
 #include "./automate.h"
 
-
 int main( int argc, char *argv[ ] )
 {
 	afn afn_ = genererAFN(argv[1]);	
@@ -29,27 +28,89 @@ int main( int argc, char *argv[ ] )
 		// parcours de l'afd réduit 
 	}
 	///////////////////////Test AFD///////////////////////////
-	afd afd = nouveauAFD(3);
-    
-    afd.etats[0] = 1;
-    afd.etats[1] = 1;
-    afd.caracteresRencontres[0] = 'a';
-    afd.caracteresRencontres[1] = 'b';
-    afd.caracteresRencontres[2] = '\0';
-    afd.transitions[0]['a'-' '] = 1;
-    afd.transitions[0]['b'-' '] = 0;
-    afd.transitions[1]['a'-' '] = 1;
-    afd.transitions[1]['b'-' '] = 2;
-    afd.transitions[2]['a'-' '] = 2;
-    afd.transitions[2]['b'-' '] = 2;
+/*	afd afd_ = nouveauAFD(5);
+	afd_.alphabet = afn_.alphabet;
+    afd_.etats[0] = 1;
+    afd_.etats[1] = 1;
+    afd_.etats[2] = 1;
+    afd_.etats[4] = 1;
+    afd_.transitions[0]['a'-' '] = 1;
+    afd_.transitions[0]['b'-' '] = 2;
+    afd_.transitions[1]['a'-' '] = 3;
+    afd_.transitions[1]['b'-' '] = 2;
+    afd_.transitions[2]['a'-' '] = 4;
+    afd_.transitions[2]['b'-' '] = 2;
+    afd_.transitions[3]['a'-' '] = 3;
+    afd_.transitions[3]['b'-' '] = 3;
+    afd_.transitions[4]['a'-' '] = 3;
+    afd_.transitions[4]['b'-' '] = 2;
 
-    afficherAFD(&afd);
-    if(executer_AFD_rec(0, "aaa", &afd, 0)){
+    afficherAFD(&afd_);
+    afd afdM = minimisation(&afd_);
+    afficherAFD(&afdM);
+   */ 
+/*
+    afd afdwiki;
+    afdwiki = nouveauAFD(8);
+    afdwiki.alphabet = afn_.alphabet;
+    afdwiki.alphabet.lettres[0] = '0';
+    afdwiki.alphabet.lettres[1] = '1';
+    afdwiki.etats[2] = 1;
+    afdwiki.etats[6] = 1;
+    afdwiki.transitions[0]['0'-' '] = 1;
+    afdwiki.transitions[0]['1'-' '] = 5;
+    afdwiki.transitions[1]['0'-' '] = 6;
+    afdwiki.transitions[1]['1'-' '] = 2;
+    afdwiki.transitions[2]['0'-' '] = 0;
+    afdwiki.transitions[2]['1'-' '] = 2;
+    afdwiki.transitions[3]['0'-' '] = 2;
+    afdwiki.transitions[3]['1'-' '] = 6;
+    afdwiki.transitions[4]['0'-' '] = 7;
+    afdwiki.transitions[4]['1'-' '] = 5;
+    afdwiki.transitions[5]['0'-' '] = 2;
+    afdwiki.transitions[5]['1'-' '] = 6;
+    afdwiki.transitions[6]['0'-' '] = 6;
+    afdwiki.transitions[6]['1'-' '] = 4;
+    afdwiki.transitions[7]['0'-' '] = 6;
+    afdwiki.transitions[7]['1'-' '] = 2;
+    
+    afficherAFD(&afdwiki);
+    if(executer_AFD_rec(0, "01011", &afdwiki, 0)){
         printf("ok\n");
     }
     else{
         printf("ko\n");
     }
+    afd afdM = minimisation(&afdwiki);
+    afficherAFD(&afdM);
+*/
+/*
+    afd afdcours;
+    afdcours = nouveauAFD(6);
+    afdcours.alphabet = afn_.alphabet;
+    afdcours.etats[0] = 1;
+    afdcours.etats[1] = 1;
+    afdcours.etats[2] = 1;
+    afdcours.etats[5] = 1;
+    afdcours.etats[3] = 1;
+    afdcours.transitions[0]['a'-' '] = 1;
+    afdcours.transitions[0]['b'-' '] = 2;
+    afdcours.transitions[1]['a'-' '] = 4;
+    afdcours.transitions[1]['b'-' '] = 3;
+    afdcours.transitions[2]['a'-' '] = 1;
+    afdcours.transitions[2]['b'-' '] = 2;
+    afdcours.transitions[3]['a'-' '] = 1;
+    afdcours.transitions[3]['b'-' '] = 2;
+    afdcours.transitions[4]['a'-' '] = 4;
+    afdcours.transitions[4]['b'-' '] = 4;
+    afdcours.transitions[5]['a'-' '] = 1;
+    afdcours.transitions[5]['b'-' '] = 2;
+    afficherAFD(&afdcours);
+    afd afdM = minimisation(&afdcours);
+    afficherAFD(&afdM);
+*/
+
+
 	//////////////////////////////////////////////////////////////////////////
 
 	return 0;
@@ -64,6 +125,7 @@ afn genererAFN(char *filename)
 	
 	// INITIALIZE AFN	
 	afn afn1 = {0};
+	afn1.alphabet.lettres = (char*)malloc(CARACTERES_IMPRIMABLES*sizeof(char));
 	// initializing array elements
 	for (int i = 0; i < CARACTERES_IMPRIMABLES; i++)
 		afn1.correspondance[i] = -1;
@@ -196,7 +258,6 @@ afd nouveauAFD(int nbEtats)
             afd.transitions[i][j] = -1;
         }
     }
-    afd.caracteresRencontres[CARACTERES_IMPRIMABLES] = '\0';
     return afd;
 }
 
@@ -204,7 +265,7 @@ afd nouveauAFD(int nbEtats)
 void afficherAFD(afd *afd)
 {
     char caractereRecontre;
-    int i, nbCaracteresRencontres;
+    int i;
     printf("%d\n", afd->nbEtats);
     
     for(i = 0; i < afd->nbEtats; i++)
@@ -216,12 +277,10 @@ void afficherAFD(afd *afd)
     }
     printf("\n\t");
     i =0;
-    nbCaracteresRencontres = 0;
     do 
     {
-        caractereRecontre = afd->caracteresRencontres[i];
-        printf("%c\t", caractereRecontre);
-        nbCaracteresRencontres++;
+        caractereRecontre = afd->alphabet.lettres[i];
+        printf("%c\t", afd->alphabet.lettres[i]);
         i++;
     }while(caractereRecontre !='\0');
     printf("\n");
@@ -229,8 +288,8 @@ void afficherAFD(afd *afd)
     for(i = 0; i < afd->nbEtats; i++)
     {
         printf("%d\t",i);
-        for(int j = 0; j < nbCaracteresRencontres -1; j++){
-            caractereRecontre = afd->caracteresRencontres[j];
+        for(int j = 0; j < afd->alphabet.nombre_lettres; j++){
+            caractereRecontre = afd->alphabet.lettres[j];
             printf("%d\t", afd->transitions[i][caractereRecontre-' ']);
         }
         printf("\n");
@@ -241,7 +300,7 @@ void afficherAFD(afd *afd)
 
 bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int profondeur)
 {
-    printf("(%d, %s) |-\t", etat_actuel, chaine_restante);
+    printf("(%d, %s) |- ", etat_actuel, chaine_restante);
 
     if(*chaine_restante == '\0')
     {
@@ -259,3 +318,5 @@ bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int pro
         }
     }
 }
+
+

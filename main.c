@@ -383,6 +383,209 @@ afd determinisationAFN(afn * afn_a_determiniser)
 	return afd_a_renvoyer;
 }
 
+
+
+afd minimisation(afd *afd_)
+{
+    afd afdMinimise;
+    int taille = afd_->nbEtats;
+    int etatArrivee1, etatArrivee2, indice =0;
+    char carCourant;
+	char **table1 = (char**)malloc(sizeof(char*) * taille);
+    char **copie_table1 =  (char**)malloc(sizeof(char*) * taille);
+    int tabCouleur[taille];
+    int couleur;
+
+	for (int i =0; i< taille; i++)
+	{
+		table1[i] = (char*) malloc(sizeof(char) * taille);
+		copie_table1[i] = (char*) malloc(sizeof(char) * taille);
+	}
+
+    for (int i=0 ; i < taille ; i++)
+    {
+        for(int j = 0; j < taille; j++)
+        {
+            table1[i][j] = '0';
+            copie_table1[i][j] = '0';
+        }
+    }
+
+    for(int l = 1; l < taille; l++)
+    {
+        for(int c =0; c < l; c++)
+        {
+            if((afd_->etats[l]== 0 && afd_->etats[c] ==1)||(afd_->etats[l]== 1 && afd_->etats[c] ==0))
+            {
+                table1[l][c] = 'X';
+            }
+        }
+    }
+
+    printf("%d\n", taille);
+       	for(int i=0; i < taille; i++)
+        {
+            printf("\t%d", i);
+        }
+        printf("\n");
+
+        for(int l = 1; l < taille; l++)
+        {
+            printf("%d\t",l);
+            for(int c =0; c < l; c++)
+            {
+                printf("%c\t", table1[l][c]);
+            }
+            printf("\n");
+        }
+    	printf("\n----------------------------------------------------\n");
+    do
+    {
+        //Copie de la table
+        for(int l = 1; l < taille; l++)
+        {
+            for(int c =0; c < l; c++)
+            {
+                copie_table1[l][c] = table1[l][c];
+            }
+        }
+
+        for(int l = 1; l < taille; l++)
+        {
+            for(int c =0; c < l; c++)
+            {
+                
+                for(int car =0; car < afd_->alphabet.nombre_lettres; car++ )
+                {
+                    carCourant = afd_->alphabet.lettres[car];
+                    if(afd_->transitions[l][carCourant-' ']!= afd_->transitions[c][carCourant-' '])
+                    {
+                        if(afd_->transitions[l][carCourant-' '] == -1 || afd_->transitions[c][carCourant-' '] == -1 )
+                        {
+                            table1[l][c] = 'X';
+                        }
+                        else
+                        {
+                            etatArrivee1 = afd_->transitions[l][carCourant-' '];
+                            etatArrivee2 = afd_->transitions[c][carCourant-' '];
+                            if(table1[max(etatArrivee1,etatArrivee2)][min(etatArrivee1,etatArrivee2)] == 'X')
+                            {
+                                table1[l][c] = 'X';
+                            }
+                        }
+                    }
+                } 
+            }
+        }
+        printf("%d\n", taille);
+       	for(int i=0; i < taille; i++)
+        {
+            printf("\t%d", i);
+        }
+        printf("\n");
+
+        for(int l = 1; l < taille; l++)
+        {
+            printf("%d\t",l);
+            for(int c =0; c < l; c++)
+            {
+                printf("%c\t", table1[l][c]);
+            }
+            printf("\n");
+        }
+    	printf("\n----------------------------------------------------\n");
+        indice++;
+    } while (sont_identique(table1,copie_table1, taille) != 1);
+    
+
+    //Nouveaux sommets Colorisation pour trouver le nouveau nombre de sommets
+    couleur = 0;
+    for(int i = 0; i < taille; i++)
+    {
+        tabCouleur[i] = -1;
+    }
+    for(int l = 1; l < taille; l++)
+    {
+        for(int c =0; c < l; c++)
+        {
+            if(table1[l][c] == '0')
+            {
+                if(tabCouleur[l]== -1 && tabCouleur[c] == -1)
+                {
+                    couleur++;
+                    tabCouleur[l] = couleur;
+                    tabCouleur[c] = couleur;
+                }
+                else if(tabCouleur[l]== -1)
+                {
+                    tabCouleur[l] = tabCouleur[c];
+                }
+                else if(tabCouleur[c]== -1)
+                {
+                    tabCouleur[c] = tabCouleur[l];
+                }
+            }
+        }
+    }
+    for(int i = 0; i < taille; i++)
+    {
+        if(tabCouleur[i] == -1)
+        {
+            couleur++;
+            tabCouleur[i] = couleur;
+        }
+        printf("%d : %d\n", i, tabCouleur[i]);
+    }
+    printf("couleur : %d\n", couleur);
+
+    int etatMarque[couleur];
+    int etatCourant;
+    for(int i = 0; i < couleur; i++)
+    {
+        etatMarque[i] = 0;
+    }
+
+    afdMinimise = nouveauAFD(couleur);
+    afdMinimise.alphabet = afd_->alphabet;
+
+    for(int i = 0 ; i < taille; i++)
+    {
+        etatCourant = tabCouleur[i] -1;
+        if(etatMarque[etatCourant] == 0)
+        {
+            for (int car = 0; car < afd_->alphabet.nombre_lettres; car++)
+            {
+                carCourant = afd_->alphabet.lettres[car];
+                afdMinimise.transitions[etatCourant][carCourant - ' '] = tabCouleur[afd_->transitions[i][carCourant - ' ']] -1;
+            }
+        }
+        if(afd_->etats[i] == 1)
+        {
+            afdMinimise.etats[etatCourant] = 1;
+        }
+    }
+
+    return afdMinimise;
+}
+
+int sont_identique(char **tab1, char **tab2, int taille )
+{
+    int ide ;
+    ide = 1;
+    for(int l = 1; l < taille; l++)
+    {
+        for(int c =0; c < l; c++)
+        {
+            if(tab1[l][c] != tab2[l][c])
+            {
+                ide = 0;
+            }
+        }
+    }
+    return ide;
+}
+
+
 void afficherAFD(afd *afd)
 {
     char caractereRecontre;

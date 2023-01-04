@@ -40,6 +40,9 @@ typedef struct AFD {
 afn genererAFN(char *file_name);
 afd nouveauAFD(int nombre_etats, alphabet * alphabet);
 afd determinisationAFN(afn * anf_a_determiniser);
+
+afd minimisation(afd *afd_);
+int sont_identique(char **tab1, char **tab2, int taille );
 void afficherAFD(afd *afd);
 bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int profondeur); // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
 bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int profondeur); // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 

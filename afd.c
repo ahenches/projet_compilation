@@ -263,16 +263,16 @@ afd minimisation(afd *afd_)
                 for(int car =0; car < afd_->alphabet.nombre_lettres; car++ )
                 {
                     carCourant = afd_->alphabet.lettres[car];
-                    if(afd_->transitions[l][carCourant-' ']!= afd_->transitions[c][carCourant-' '])
+                    if(afd_->transitions[l][afd_->alphabet.correspondance[carCourant-' ']]!= afd_->transitions[c][afd_->alphabet.correspondance[carCourant-' ']])
                     {
-                        if(afd_->transitions[l][carCourant-' '] == -1 || afd_->transitions[c][carCourant-' '] == -1 )
+                        if(afd_->transitions[l][afd_->alphabet.correspondance[carCourant-' ']] == -1 || afd_->transitions[c][afd_->alphabet.correspondance[carCourant-' ']] == -1 )
                         {
                             table1[l][c] = 'X';
                         }
                         else
                         {
-                            etatArrivee1 = afd_->transitions[l][carCourant-' '];
-                            etatArrivee2 = afd_->transitions[c][carCourant-' '];
+                            etatArrivee1 = afd_->transitions[l][afd_->alphabet.correspondance[carCourant-' ']];
+                            etatArrivee2 = afd_->transitions[c][afd_->alphabet.correspondance[carCourant-' ']];
                             if(table1[max(etatArrivee1,etatArrivee2)][min(etatArrivee1,etatArrivee2)] == 'X')
                             {
                                 table1[l][c] = 'X';

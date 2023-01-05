@@ -361,7 +361,7 @@ afd minimisation(afd *afd_)
             for (int car = 0; car < afd_->alphabet.nombre_lettres; car++)
             {
                 carCourant = afd_->alphabet.lettres[car];
-                afdMinimise.transitions[etatCourant][carCourant - ' '] = tabCouleur[afd_->transitions[i][carCourant - ' ']] -1;
+                afdMinimise.transitions[etatCourant][afd_->alphabet.correspondance[carCourant - ' ']] = tabCouleur[afd_->transitions[i][afd_->alphabet.correspondance[carCourant - ' ']] -1;
             }
         }
         if(afd_->etats[i] == 1)

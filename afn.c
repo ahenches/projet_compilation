@@ -23,7 +23,6 @@ afn genererAFN(char *filename)
 	int nombre_etats;
 	fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr);
 	nombre_etats = atoi(line);
-	printf("Nombre d'états : %d\n",nombre_etats); 
 
 	afn1.nombre_etats = nombre_etats;
 	afn1.sont_etats_finals = calloc(nombre_etats, sizeof(char));
@@ -76,6 +75,7 @@ afn genererAFN(char *filename)
 		afn1.etats_transitions[etat_d][indice_lettre].etats[indice_etat_f] = etat_f;
 	}
 	fclose(ptr);
+	//mémoire à libérer
 	return afn1;
 }
 
@@ -94,29 +94,29 @@ int compter_digit(long long n)
 }
 // fin fonctions outils
 
-bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int taille_retrait) // return 1 si mot restant valide PEUT ETRE RECURSIVE OU NON 
+bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int taille_retrait)
 {
 	printf("(%d, %s)", etat_actuel, chaine_restante);
 	if (*chaine_restante == '\0')
 	{
-		printf(afn->sont_etats_finals[etat_actuel] ? "|- ok" : "|- ko");
+		printf(afn->sont_etats_finals[etat_actuel] ? " |- ok" : " |- ko");
 		printf("\n");
 		return afn->sont_etats_finals[etat_actuel]; // renvoie Vrai si état_actuel est final Faux sinon
 	}
 	else {
 		bool mot_restant_valide = 0;
-		taille_retrait += compter_digit(etat_actuel) + strlen(chaine_restante) + 7;
+		taille_retrait += compter_digit(etat_actuel) + strlen(chaine_restante) + strlen("(, ) |- ");
 		int i = 0;
 		while(i < afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].nombre_etats_non_determinises && !mot_restant_valide)
 		{
 			if (i > 0)
 				afficher_n_fois(" ", taille_retrait);
-			printf("|- ");
+			printf(" |- ");
 			mot_restant_valide = mot_restant_valide |  executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, taille_retrait);
 			i++;
 		}
 		if (afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].nombre_etats_non_determinises == 0)
-			 printf("|- ko \n");
+			 printf(" |- ko \n");
 		return mot_restant_valide;
 	}
 }

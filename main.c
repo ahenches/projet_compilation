@@ -5,32 +5,29 @@
 #include "./afd.h"
 #include "./afn.h"
 
+
 int main( int argc, char *argv[ ] )
 {
 	afn afn_ = genererAFN(argv[1]);	
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afn
-		printf("%s\n", argv[i]);
-		if (executer_AFN_rec(0, argv[i], &afn_, -3))
-			printf("Mot Valide !\n");
+		if (executer_AFN_rec(0, argv[i], &afn_, OFFSET_FOR_RECURSIVE_EXEC))
+			printf("ok\n");
 		else
-			printf("Mot NON Valide !\n");
+			printf("ko\n");
 	}
 	afd afd_ = determinisationAFN(&afn_);
 	afficherAFD(&afd_);
 	// determinisation
-	/*
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afd
-		printf("%s\n", argv[i]);
 		if (executer_AFD_rec(0, argv[i], &afd_, 0))
-			printf("Mot Valide !\n");
+			printf("ok\n");
 		else
-			printf("Mot NON Valide !\n");
+			printf("ko\n");
 	}
-	*/
 	// minimalisation
 	for(int i = 2; i < argc; i++)
 	{
@@ -123,6 +120,27 @@ int main( int argc, char *argv[ ] )
 	//////////////////////////////////////////////////////////////////////////
 
 	// NE PAS OUBLIER DE FREE LA MEMOIRE
+
+
+	// LIBERATION DE MEMOIRE // 
+	free(afn_.alphabet.lettres); // libération alphabet
+	
+	// libération afn_
+	free(afn_.sont_etats_finals); 
+	for(int i = 0; i < afd_.nombre_etats; i++)
+	{
+		free(afn_.etats_transitions[i]);
+	}
+	free(afn_.etats_transitions);
+	
+	// libération afd_
+	free(afd_.etats); 
+	for(int i = 0; i < afd_.nombre_etats; i++)
+	{
+		free(afd_.transitions[i]);
+	}
+	free(afd_.transitions);
+
 
 	return 0;
 }

@@ -15,6 +15,7 @@ afd nouveauAFD(int nombre_etats, alphabet * alphabet)
 			afd.transitions[i][j] = -1;
 		}
 	}
+	// mémoire à libérer
 	return afd;
 }
 
@@ -23,7 +24,7 @@ afd nouveauAFD(int nombre_etats, alphabet * alphabet)
 void afficherAFD(afd *afd)
 {
     char caractereRecontre;
-    printf("afd.nombre_etats %d\n", afd->nombre_etats);
+    printf("%d\n", afd->nombre_etats);
     
     for(int i = 0; i < afd->nombre_etats; i++)
     {
@@ -63,13 +64,13 @@ bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int pro
     }
     else
     {
-        if(afd->transitions[etat_actuel][*chaine_restante-' '] == -1)
+        if(afd->transitions[etat_actuel][afd->alphabet.correspondance[*chaine_restante-' ']] == -1)
         {
             return 0;
         }
         else
         {
-            return executer_AFD_rec(afd->transitions[etat_actuel][*chaine_restante-' '], &chaine_restante[1], afd, profondeur+1);
+            return executer_AFD_rec(afd->transitions[etat_actuel][afd->alphabet.correspondance[*chaine_restante-' ']], &chaine_restante[1], afd, profondeur+1);
         }
     }
 }
@@ -79,17 +80,6 @@ bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int pro
 bool est_set_etats_egaux(etats_non_determinises * etats1, etats_non_determinises * etats2)
 {
 	
-	/*	printf("\t\t\t\t\tETAT\n\t\t\t\t\t");
-	for(int i = 0; i < etats1->nombre_etats_non_determinises; i++)
-	{
-		printf("%d ", etats1->etats[i]);
-	}
-		printf("\n\t\t\t\t\tetat_dans_liste\n\t\t\t\t\t");
-	for(int i = 0; i < etats2->nombre_etats_non_determinises; i++)
-	{
-		printf("%d ", etats2->etats[i]);
-	}
-	*/
 	if (etats1->nombre_etats_non_determinises != etats2->nombre_etats_non_determinises) return 0;
 	else 
 	{
@@ -130,16 +120,6 @@ void set_etats_union(etats_non_determinises * etats1, etats_non_determinises * e
 
 }
 
-void afficher_etats(etats_non_determinises * etats)
-{
-	printf("\n");
-	for(int i = 0; i < etats->nombre_etats_non_determinises; i++)
-	{
-		printf("%d ", etats->etats[i]);
-	}
-	printf("\n");
-}
-
 // fin fonctions outils
 
 afd determinisationAFN(afn * afn_a_determiniser)
@@ -175,7 +155,7 @@ afd determinisationAFN(afn * afn_a_determiniser)
 			else 
 			{
 				etats_non_determinises * etats_transition;
-				etats_non_determinises * etats_totaux = malloc(sizeof(etats_non_determinises)); // malloc ?!
+				etats_non_determinises * etats_totaux = malloc(sizeof(etats_non_determinises));
 				etats_totaux->nombre_etats_non_determinises = 0;
 				for (int j = 0; j < file[indice_parcours]->nombre_etats_non_determinises; j++)
 				{
@@ -184,7 +164,7 @@ afd determinisationAFN(afn * afn_a_determiniser)
 					set_etats_union(etats_totaux, etats_transition);
 					if (afn_a_determiniser->sont_etats_finals[etat_actuel]) est_final = 1;
 				}
-				// Verification si etat_N_actuel est déjà dans file sinon on le rajoute
+				// Verification si etats_totaux est déjà dans file sinon on le rajoute
 				if (indice_ensemble_vide == -1 && etats_totaux->nombre_etats_non_determinises == 0) indice_ensemble_vide = taille_file;
 				indice_dans_file = indice_set_etats_dans_tableau(etats_totaux, file, taille_file);
 				if (indice_dans_file == -1)
@@ -205,6 +185,8 @@ afd determinisationAFN(afn * afn_a_determiniser)
 		afd_a_renvoyer.etats[indice_parcours] = est_final;
 		indice_parcours++;
 	}
+	for (int i = 1; i < taille_file; i++)
+		free(file[i]);
 	return afd_a_renvoyer;
 }
 

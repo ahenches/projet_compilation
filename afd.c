@@ -304,7 +304,7 @@ afd minimisation(afd *afd_)
     
 
     //Nouveaux sommets Colorisation pour trouver le nouveau nombre de sommets
-    couleur = 0;
+    couleur = -1;
     for(int i = 0; i < taille; i++)
     {
         tabCouleur[i] = -1;
@@ -341,27 +341,27 @@ afd minimisation(afd *afd_)
         }
         printf("%d : %d\n", i, tabCouleur[i]);
     }
-    printf("couleur : %d\n", couleur);
+    printf("couleur : %d\n", couleur+1);
 
-    int etatMarque[couleur];
+    int etatMarque[couleur + 1];
     int etatCourant;
-    for(int i = 0; i < couleur; i++)
+    for(int i = 0; i < couleur +1; i++)
     {
         etatMarque[i] = 0;
     }
 
-    afdMinimise = nouveauAFD(couleur, &afd_->alphabet);
+    afdMinimise = nouveauAFD(couleur+1, &afd_->alphabet);
     afdMinimise.alphabet = afd_->alphabet;
 
     for(int i = 0 ; i < taille; i++)
     {
-        etatCourant = tabCouleur[i] -1;
+        etatCourant = tabCouleur[i];
         if(etatMarque[etatCourant] == 0)
         {
             for (int car = 0; car < afd_->alphabet.nombre_lettres; car++)
             {
                 carCourant = afd_->alphabet.lettres[car];
-                afdMinimise.transitions[etatCourant][carCourant - ' '] = tabCouleur[afd_->transitions[i][carCourant - ' ']] -1;
+                afdMinimise.transitions[etatCourant][afd_->alphabet.correspondance[carCourant-' ']] = tabCouleur[afd_->transitions[i][afd_->alphabet.correspondance[carCourant-' ']]] ;
             }
         }
         if(afd_->etats[i] == 1)

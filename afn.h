@@ -22,17 +22,17 @@ typedef struct Alphabet {
 } alphabet;
 
 
-typedef struct Etats_non_determine {
-	int nombre_etats_non_determine;
+typedef struct Etats_non_determinises {
+	int nombre_etats_non_determinises;
 	int etats[MAX_NOMBRE_ETATS_NON_DETERMINE];
-} etats_non_determine;
+} etats_non_determinises;
 
-bool est_set_etats_egaux(etats_non_determine * etat1, etats_non_determine * etat2);
-int indice_set_etats_dans_tableau(etats_non_determine * etats, etats_non_determine ** liste_set_etats, int taille_liste);
+bool est_set_etats_egaux(etats_non_determinises * etat1, etats_non_determinises * etat2);
+int indice_set_etats_dans_tableau(etats_non_determinises * etats, etats_non_determinises ** liste_set_etats, int taille_liste);
 
 
 typedef struct AFN {
-	etats_non_determine ** etats_transitions;
+	etats_non_determinises ** etats_transitions;
 	bool * sont_etats_finals;
 	int nombre_etats;
 	alphabet alphabet;

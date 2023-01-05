@@ -8,27 +8,6 @@
 int main( int argc, char *argv[ ] )
 {
 	afn afn_ = genererAFN(argv[1]);	
-	etats_non_determine etats_0, etats_1, e1= {0}, e2 = {0}, e3= {0}, e4= {0};
-	e2.nombre_etats_non_determine = 0;
-	e1.etats[0] = 5;
-	e1.nombre_etats_non_determine++;
-	etats_non_determine * l[5];
-	l[3] = &etats_1;
-	l[0] = &e1;
-	l[1] = &e2;
-	l[2] = &e4;
-	l[4] = &e3;
-	etats_1.etats[0] = 0;
-	etats_1.etats[1] = 5;
-	etats_1.etats[2] = 4;
-	etats_1.etats[3] = 1;
-	etats_0.etats[0] = 0;
-	etats_0.etats[1] = 5;
-	etats_0.etats[2] = 4;
-	etats_0.etats[3] = 1;
-	etats_1.nombre_etats_non_determine = 4;
-	etats_0.nombre_etats_non_determine = 4;
-	//printf("%d", indice_set_etats_dans_tableau(&etats_0, l, 5));
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afn

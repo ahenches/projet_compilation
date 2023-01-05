@@ -55,21 +55,15 @@ afn genererAFN(char *filename)
 			afn1.alphabet.correspondance[*res-' '] = afn1.alphabet.nombre_lettres++;
 		}
 	}
-	free(afn1.alphabet.lettres);
-	afn1.alphabet.lettres = (char*)malloc(afn1.alphabet.nombre_lettres*sizeof(char));
+	afn1.alphabet.lettres = (char *)realloc(afn1.alphabet.lettres, afn1.alphabet.nombre_lettres*sizeof(char));
 	fseek(ptr, save, SEEK_SET);
-	
-	for(int i = 0; i < afn1.alphabet.nombre_lettres; i++)
-	{
-		printf("%de lettre : %c\n", i, afn1.alphabet.lettres[i]);
-	}
 	
 	// deuxième parcours pour remplir le tableau des transitions à deux entrées (etat, lettre)
 	i = 0;
-	afn1.etats_transitions = malloc(nombre_etats * sizeof(etats_non_determine *)); 
+	afn1.etats_transitions = malloc(nombre_etats * sizeof(etats_non_determinises *)); 
 	for (int i = 0; i < nombre_etats; i++)
 	{
-		afn1.etats_transitions[i] = calloc(afn1.alphabet.nombre_lettres, sizeof(etats_non_determine)); 
+		afn1.etats_transitions[i] = calloc(afn1.alphabet.nombre_lettres, sizeof(etats_non_determinises)); 
 	}
 	int etat_d, etat_f, indice_lettre, indice_etat_f;
 	while(fgets(line, MAX_CARACTERE_PAR_LIGNE, ptr) != NULL)
@@ -78,7 +72,7 @@ afn genererAFN(char *filename)
 		res = strtok(NULL, delim);
 		etat_f = atoi(strtok(NULL, delim));
 		indice_lettre = afn1.alphabet.correspondance[*res - ' '];
-		indice_etat_f = afn1.etats_transitions[etat_d][indice_lettre].nombre_etats_non_determine++;
+		indice_etat_f = afn1.etats_transitions[etat_d][indice_lettre].nombre_etats_non_determinises++;
 		afn1.etats_transitions[etat_d][indice_lettre].etats[indice_etat_f] = etat_f;
 	}
 	fclose(ptr);
@@ -113,7 +107,7 @@ bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int tai
 		bool mot_restant_valide = 0;
 		taille_retrait += compter_digit(etat_actuel) + strlen(chaine_restante) + 7;
 		int i = 0;
-		while(i < afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].nombre_etats_non_determine && !mot_restant_valide)
+		while(i < afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].nombre_etats_non_determinises && !mot_restant_valide)
 		{
 			if (i > 0)
 				afficher_n_fois(" ", taille_retrait);
@@ -121,7 +115,7 @@ bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int tai
 			mot_restant_valide = mot_restant_valide |  executer_AFN_rec(afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].etats[i], &chaine_restante[1], afn, taille_retrait);
 			i++;
 		}
-		if (afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].nombre_etats_non_determine == 0)
+		if (afn->etats_transitions[etat_actuel][afn->alphabet.correspondance[*chaine_restante-' ']].nombre_etats_non_determinises == 0)
 			 printf("|- ko \n");
 		return mot_restant_valide;
 	}

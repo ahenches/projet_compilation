@@ -190,6 +190,23 @@ afd determinisationAFN(afn * afn_a_determiniser)
 	return afd_a_renvoyer;
 }
 
+int sont_identique(char **tab1, char **tab2, int taille )
+{
+    int ide ;
+    ide = 1;
+    for(int l = 1; l < taille; l++)
+    {
+        for(int c =0; c < l; c++)
+        {
+            if(tab1[l][c] != tab2[l][c])
+            {
+                ide = 0;
+            }
+        }
+    }
+    return ide;
+}
+
 afd minimisation(afd *afd_)
 {
     afd afdMinimise;

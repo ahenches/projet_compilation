@@ -146,22 +146,3 @@ int main( int argc, char *argv[ ] )
 }
 
 
-// A quoi ça sert?
-int sont_identique(char **tab1, char **tab2, int taille )
-{
-    int ide ;
-    ide = 1;
-    for(int l = 1; l < taille; l++)
-    {
-        for(int c =0; c < l; c++)
-        {
-            if(tab1[l][c] != tab2[l][c])
-            {
-                ide = 0;
-            }
-        }
-    }
-    return ide;
-}
-
-

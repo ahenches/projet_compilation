@@ -17,9 +17,10 @@ int main( int argc, char *argv[ ] )
 		else
 			printf("ko\n");
 	}
+    
+    // determinisation
 	afd afd_ = determinisationAFN(&afn_);
 	afficherAFD(&afd_);
-	// determinisation
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afd
@@ -29,9 +30,15 @@ int main( int argc, char *argv[ ] )
 			printf("ko\n");
 	}
 	// minimalisation
+    afd afdm = minimisation(&afd_);
+    afficherAFD(&afdm);
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afd réduit 
+        if (executer_AFD_rec(0, argv[i], &afdm, 0))
+			printf("ok\n");
+		else
+			printf("ko\n");
 	}
 	///////////////////////Test AFD///////////////////////////
 /*	afd afd_ = nouveauAFD(5);
@@ -140,6 +147,14 @@ int main( int argc, char *argv[ ] )
 		free(afd_.transitions[i]);
 	}
 	free(afd_.transitions);
+
+    // libération afdm
+	free(afdm.etats); 
+	for(int i = 0; i < afdm.nombre_etats; i++)
+	{
+		free(afdm.transitions[i]);
+	}
+	free(afdm.transitions);
 
 
 	return 0;

@@ -370,5 +370,15 @@ afd minimisation(afd *afd_)
         }
     }
 
+    for (int i =0; i< taille; i++)
+	{
+		free(table1[i]); 
+		free(copie_table1[i]);
+	}
+    free(table1);
+    free(copie_table1);
+
+
+
     return afdMinimise;
 }

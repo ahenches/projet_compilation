@@ -1,4 +1,14 @@
 #include "afd.h"
+//Auteurs : Arnaud Henches, Maud Lestienne
+
+
+/**
+ * @brief Pemet d'instancier les variables de la structure afd
+ * 
+ * @param nombre_etats le nombre d etats de l afd 
+ * @param alphabet l'alphabet que l on passe à l'afd 
+ * @return afd instancié
+ */
 afd nouveauAFD(int nombre_etats, alphabet * alphabet)
 {
 	afd afd;
@@ -15,17 +25,22 @@ afd nouveauAFD(int nombre_etats, alphabet * alphabet)
 			afd.transitions[i][j] = -1;
 		}
 	}
-	// mémoire à libérer
 	return afd;
 }
 
-
-
+/**
+ * @brief Permet d'afficher l'afd passé en paramètre
+ * 
+ * @param afd l'afd a afficher
+ */
 void afficherAFD(afd *afd)
 {
     char caractereRecontre;
+
+    //Affichage du nombre d'etats
     printf("%d\n", afd->nombre_etats);
     
+    //Affichage des etats finaux
     for(int i = 0; i < afd->nombre_etats; i++)
     {
         if(afd->etats[i] != 0)
@@ -35,6 +50,7 @@ void afficherAFD(afd *afd)
     }
     printf("\n\t");
 
+    //Affichage des transitions
 	for(int i = 0; i < afd->alphabet.nombre_lettres; i++)
 	{
         printf("%c \t", afd->alphabet.lettres[i]);
@@ -44,24 +60,33 @@ void afficherAFD(afd *afd)
     {
         printf("%d\t", i);
         for(int j = 0; j < afd->alphabet.nombre_lettres; j++){
-            //caractereRecontre = afd->alphabet.lettres[j];
-            //printf("%d\t", afd->transitions[i][afd->alphabet.correspondance[caractereRecontre-' ']]);
             printf("%d\t", afd->transitions[i][j]);
         }
         printf("\n");
     }
 }
 
-
-
-bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int profondeur)
+/**
+ * @brief Permet d executer l afd sur un mot, la fonction est recursive 
+ * 
+ * @param etat_actuel l'etat dans lequel on se trouve
+ * @param chaine_restante le reste du mot a traiter
+ * @param afd l afd sur lequel on execute le mot
+ * @return true si le mot est valide pour l automate
+ * @return false si le mot n est pas valide pour l'automate
+ */
+bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd)
 {
+    //Affichage de l'etat actuel et du reste du mot a traiter
     printf("(%d, %s) |- ", etat_actuel, chaine_restante);
 
+    //Fin du mot, on regarde si l etat actuel est terminal pour savoir si le mot est valide
     if(*chaine_restante == '\0')
     {
         return afd->etats[etat_actuel];
     }
+    //Le mot n est pas fini, on lance la recursion si il existe une transiton pour l etat actuel avec le carcatere du mot
+    //Sinon on retourne false car on ne va pas au bout du mot
     else
     {
         if(afd->transitions[etat_actuel][afd->alphabet.correspondance[*chaine_restante-' ']] == -1)
@@ -70,7 +95,7 @@ bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd, int pro
         }
         else
         {
-            return executer_AFD_rec(afd->transitions[etat_actuel][afd->alphabet.correspondance[*chaine_restante-' ']], &chaine_restante[1], afd, profondeur+1);
+            return executer_AFD_rec(afd->transitions[etat_actuel][afd->alphabet.correspondance[*chaine_restante-' ']], &chaine_restante[1], afd);
         }
     }
 }
@@ -190,6 +215,16 @@ afd determinisationAFN(afn * afn_a_determiniser)
 	return afd_a_renvoyer;
 }
 
+//Fonctions pour la minimisation
+
+/**
+ * @brief Permet de savoir si le triangle inferieur gauche des tableaux sont identiques
+ * 
+ * @param tab1 un des tableaux a comparer
+ * @param tab2  un des tableaux a comparer
+ * @param taille la taille des tableaux
+ * @return int 1 si les triangles inferieurs gauche sont identique sinon 0
+ */
 int sont_identique(char **tab1, char **tab2, int taille )
 {
     int ide ;
@@ -207,17 +242,26 @@ int sont_identique(char **tab1, char **tab2, int taille )
     return ide;
 }
 
+/**
+ * @brief Minimise l' afd passe en parametre
+ * On utilise l alogorithme de recherche d etats separables avec la methode de remplissage de table
+ * source : https://fr.wikipedia.org/wiki/Minimisation_d%27un_automate_fini_déterministe 
+ * 
+ * @param afd_ l afd a minimisé
+ * @return afd l afd minimisé 
+ */
 afd minimisation(afd *afd_)
 {
     afd afdMinimise;
     int taille = afd_->nombre_etats;
-    int etatArrivee1, etatArrivee2, indice =0;
+    int etatArrivee1, etatArrivee2;
     char carCourant;
-	char **table1 = (char**)malloc(sizeof(char*) * taille);
-    char **copie_table1 =  (char**)malloc(sizeof(char*) * taille);
-    int tabCouleur[taille];
+	char **table1 = (char**)malloc(sizeof(char*) * taille); //la table que l on rempli indexe par les etats de l afd 
+    char **copie_table1 =  (char**)malloc(sizeof(char*) * taille); //copie de la table pour savoir quand s arreter
+    int tabCouleur[taille]; //Tableau pour la colorisation des etats
     int couleur;
 
+    //Allocation memoire et initialisation des tableaux
 	for (int i =0; i< taille; i++)
 	{
 		table1[i] = (char*) malloc(sizeof(char) * taille);
@@ -233,6 +277,7 @@ afd minimisation(afd *afd_)
         }
     }
 
+    //On met une croix dans une case quand l un des etat est terminal et l autre non (les etats etant les indices de la case)
     for(int l = 1; l < taille; l++)
     {
         for(int c =0; c < l; c++)
@@ -244,23 +289,6 @@ afd minimisation(afd *afd_)
         }
     }
 
-    printf("%d\n", taille);
-       	for(int i=0; i < taille; i++)
-        {
-            printf("\t%d", i);
-        }
-        printf("\n");
-
-        for(int l = 1; l < taille; l++)
-        {
-            printf("%d\t",l);
-            for(int c =0; c < l; c++)
-            {
-                printf("%c\t", table1[l][c]);
-            }
-            printf("\n");
-        }
-    	printf("\n----------------------------------------------------\n");
     do
     {
         //Copie de la table
@@ -280,6 +308,8 @@ afd minimisation(afd *afd_)
                 for(int car =0; car < afd_->alphabet.nombre_lettres; car++ )
                 {
                     carCourant = afd_->alphabet.lettres[car];
+
+                    //On met une croix dans une case quand les 2 etats n ont pas le meme etats d arrivé pour une transition sur un caractere (les etats sont les indices de la case)
                     if(afd_->transitions[l][afd_->alphabet.correspondance[carCourant-' ']]!= afd_->transitions[c][afd_->alphabet.correspondance[carCourant-' ']])
                     {
                         if(afd_->transitions[l][afd_->alphabet.correspondance[carCourant-' ']] == -1 || afd_->transitions[c][afd_->alphabet.correspondance[carCourant-' ']] == -1 )
@@ -299,24 +329,6 @@ afd minimisation(afd *afd_)
                 } 
             }
         }
-        printf("%d\n", taille);
-       	for(int i=0; i < taille; i++)
-        {
-            printf("\t%d", i);
-        }
-        printf("\n");
-
-        for(int l = 1; l < taille; l++)
-        {
-            printf("%d\t",l);
-            for(int c =0; c < l; c++)
-            {
-                printf("%c\t", table1[l][c]);
-            }
-            printf("\n");
-        }
-    	printf("\n----------------------------------------------------\n");
-        indice++;
     } while (sont_identique(table1,copie_table1, taille) != 1);
     
 
@@ -330,14 +342,17 @@ afd minimisation(afd *afd_)
     {
         for(int c =0; c < l; c++)
         {
+            //Si une case est sans croix les etats doivent regroupés ont leur attribut la meme couleur
             if(table1[l][c] == '0')
             {
+                //Si aucun des etats n a encore de couleur attribué ont leur associe une nouvelle couleur
                 if(tabCouleur[l]== -1 && tabCouleur[c] == -1)
                 {
                     couleur++;
                     tabCouleur[l] = couleur;
                     tabCouleur[c] = couleur;
                 }
+                //Sinon on associe la couleur de l'un à l'autre car ils sont du meme groupe
                 else if(tabCouleur[l]== -1)
                 {
                     tabCouleur[l] = tabCouleur[c];
@@ -349,6 +364,7 @@ afd minimisation(afd *afd_)
             }
         }
     }
+    //On associe une nouvelle couleur aux etats seuls
     for(int i = 0; i < taille; i++)
     {
         if(tabCouleur[i] == -1)
@@ -356,9 +372,7 @@ afd minimisation(afd *afd_)
             couleur++;
             tabCouleur[i] = couleur;
         }
-        printf("%d : %d\n", i, tabCouleur[i]);
     }
-    printf("couleur : %d\n", couleur+1);
 
     int etatMarque[couleur + 1];
     int etatCourant;
@@ -367,6 +381,7 @@ afd minimisation(afd *afd_)
         etatMarque[i] = 0;
     }
 
+    //On creer le nouvel afd
     afdMinimise = nouveauAFD(couleur+1, &afd_->alphabet);
     afdMinimise.alphabet = afd_->alphabet;
 
@@ -377,16 +392,19 @@ afd minimisation(afd *afd_)
         {
             for (int car = 0; car < afd_->alphabet.nombre_lettres; car++)
             {
+                //On prends les transitions du premier etat que l on croise pour le groupe
                 carCourant = afd_->alphabet.lettres[car];
                 afdMinimise.transitions[etatCourant][afd_->alphabet.correspondance[carCourant-' ']] = tabCouleur[afd_->transitions[i][afd_->alphabet.correspondance[carCourant-' ']]] ;
             }
         }
+        //Si un groupe possede un etat accepteur alors le groupe devient accepteur
         if(afd_->etats[i] == 1)
         {
             afdMinimise.etats[etatCourant] = 1;
         }
     }
 
+    //Liberation de la memoire
     for (int i =0; i< taille; i++)
 	{
 		free(table1[i]); 
@@ -394,8 +412,6 @@ afd minimisation(afd *afd_)
 	}
     free(table1);
     free(copie_table1);
-
-
 
     return afdMinimise;
 }

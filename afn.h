@@ -1,3 +1,5 @@
+//Auteur : Arnaud Henches
+
 #if !defined(AFN)
 #define AFN
 #define OFFSET_FOR_RECURSIVE_EXEC -4

@@ -1,5 +1,7 @@
 #include "afn.h"
 
+//Auteur : Arnaud Henches
+
 afn genererAFN(char *filename)
 {
 	

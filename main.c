@@ -5,6 +5,7 @@
 #include "./afd.h"
 #include "./afn.h"
 
+//Auteurs : Arnaud Henches, Maud Lestienne
 
 int main( int argc, char *argv[ ] )
 {
@@ -24,111 +25,24 @@ int main( int argc, char *argv[ ] )
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afd
-		if (executer_AFD_rec(0, argv[i], &afd_, 0))
+		if (executer_AFD_rec(0, argv[i], &afd_))
 			printf("ok\n");
 		else
 			printf("ko\n");
 	}
-	// minimalisation
+
+	// minimisation
     afd afdm = minimisation(&afd_);
     afficherAFD(&afdm);
 	for(int i = 2; i < argc; i++)
 	{
 		// parcours de l'afd réduit 
-        if (executer_AFD_rec(0, argv[i], &afdm, 0))
+        if (executer_AFD_rec(0, argv[i], &afdm))
 			printf("ok\n");
 		else
 			printf("ko\n");
 	}
-	///////////////////////Test AFD///////////////////////////
-/*	afd afd_ = nouveauAFD(5);
-	afd_.alphabet = afn_.alphabet;
-    afd_.etats[0] = 1;
-    afd_.etats[1] = 1;
-    afd_.etats[2] = 1;
-    afd_.etats[4] = 1;
-    afd_.transitions[0]['a'-' '] = 1;
-    afd_.transitions[0]['b'-' '] = 2;
-    afd_.transitions[1]['a'-' '] = 3;
-    afd_.transitions[1]['b'-' '] = 2;
-    afd_.transitions[2]['a'-' '] = 4;
-    afd_.transitions[2]['b'-' '] = 2;
-    afd_.transitions[3]['a'-' '] = 3;
-    afd_.transitions[3]['b'-' '] = 3;
-    afd_.transitions[4]['a'-' '] = 3;
-    afd_.transitions[4]['b'-' '] = 2;
-
-    afficherAFD(&afd_);
-    afd afdM = minimisation(&afd_);
-    afficherAFD(&afdM);
-   */ 
-/*
-    afd afdwiki;
-    afdwiki = nouveauAFD(8);
-    afdwiki.alphabet = afn_.alphabet;
-    afdwiki.alphabet.lettres[0] = '0';
-    afdwiki.alphabet.lettres[1] = '1';
-    afdwiki.etats[2] = 1;
-    afdwiki.etats[6] = 1;
-    afdwiki.transitions[0]['0'-' '] = 1;
-    afdwiki.transitions[0]['1'-' '] = 5;
-    afdwiki.transitions[1]['0'-' '] = 6;
-    afdwiki.transitions[1]['1'-' '] = 2;
-    afdwiki.transitions[2]['0'-' '] = 0;
-    afdwiki.transitions[2]['1'-' '] = 2;
-    afdwiki.transitions[3]['0'-' '] = 2;
-    afdwiki.transitions[3]['1'-' '] = 6;
-    afdwiki.transitions[4]['0'-' '] = 7;
-    afdwiki.transitions[4]['1'-' '] = 5;
-    afdwiki.transitions[5]['0'-' '] = 2;
-    afdwiki.transitions[5]['1'-' '] = 6;
-    afdwiki.transitions[6]['0'-' '] = 6;
-    afdwiki.transitions[6]['1'-' '] = 4;
-    afdwiki.transitions[7]['0'-' '] = 6;
-    afdwiki.transitions[7]['1'-' '] = 2;
-    
-    afficherAFD(&afdwiki);
-    if(executer_AFD_rec(0, "01011", &afdwiki, 0)){
-        printf("ok\n");
-    }
-    else{
-        printf("ko\n");
-    }
-    afd afdM = minimisation(&afdwiki);
-    afficherAFD(&afdM);
-*/
-/*
-    afd afdcours;
-    afdcours = nouveauAFD(6);
-    afdcours.alphabet = afn_.alphabet;
-    afdcours.etats[0] = 1;
-    afdcours.etats[1] = 1;
-    afdcours.etats[2] = 1;
-    afdcours.etats[5] = 1;
-    afdcours.etats[3] = 1;
-    afdcours.transitions[0]['a'-' '] = 1;
-    afdcours.transitions[0]['b'-' '] = 2;
-    afdcours.transitions[1]['a'-' '] = 4;
-    afdcours.transitions[1]['b'-' '] = 3;
-    afdcours.transitions[2]['a'-' '] = 1;
-    afdcours.transitions[2]['b'-' '] = 2;
-    afdcours.transitions[3]['a'-' '] = 1;
-    afdcours.transitions[3]['b'-' '] = 2;
-    afdcours.transitions[4]['a'-' '] = 4;
-    afdcours.transitions[4]['b'-' '] = 4;
-    afdcours.transitions[5]['a'-' '] = 1;
-    afdcours.transitions[5]['b'-' '] = 2;
-    afficherAFD(&afdcours);
-    afd afdM = minimisation(&afdcours);
-    afficherAFD(&afdM);
-*/
-
-
-	//////////////////////////////////////////////////////////////////////////
-
-	// NE PAS OUBLIER DE FREE LA MEMOIRE
-
-
+	
 	// LIBERATION DE MEMOIRE // 
 	free(afn_.alphabet.lettres); // libération alphabet
 	

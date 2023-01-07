@@ -21,7 +21,6 @@ typedef char bool;
  * lettre est un tableau de taille nombre_lettres qui contient les lettres
  * correspondance est un tableau de taille 95 le nombre de caractère imprimable du code ascii il permet de donner directement à une lettre l'indice dans le tableau lettre
  */
-typedef struct AFN {
 typedef struct Alphabet {
 	int nombre_lettres;
 	char *lettres;

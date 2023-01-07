@@ -406,7 +406,6 @@ afd minimisation(afd *afd_)
 
     //On creer le nouvel afd
     afdMinimise = nouveauAFD(couleur+1, &afd_->alphabet);
-    afdMinimise.alphabet = afd_->alphabet;
 
     for(int i = 0 ; i < taille; i++)
     {

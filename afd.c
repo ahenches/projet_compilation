@@ -1,7 +1,6 @@
 #include "afd.h"
 //Auteurs : Arnaud Henches, Maud Lestienne
 
-
 /**
  * @brief Pemet d'instancier les variables de la structure afd
  * 
@@ -102,6 +101,13 @@ bool executer_AFD_rec(int etat_actuel, char chaine_restante[], afd *afd)
 
 // fonctions outils qui servent à determiniser
 
+/**
+ * @brief test si les deux sets sont équivalent
+ * 
+ * @param  etats1 l'état 1
+ * @param  etats2 l'état 2
+ * @return 1 si vrai 0 si faux
+ */
 bool est_set_etats_egaux(etats_non_determinises * etats1, etats_non_determinises * etats2)
 {
 	
@@ -116,18 +122,30 @@ bool est_set_etats_egaux(etats_non_determinises * etats1, etats_non_determinises
 	}	
 }
 
+/**
+ * @brief retourne l'indice du set dans la liste ou -1 si le set n'est pas présent.
+ * 
+ * @param  etats l'ensemble
+ * @param  liste_set_etats la liste d'ensemble
+ * @param  taille_liste la taille de la liste
+ * @return l'indice dans la liste ou -1
+ */
 int indice_set_etats_dans_tableau(etats_non_determinises * etats, etats_non_determinises ** liste_set_etats, int taille_liste)
 {
-	// printf("\t\t\t\t\tTEST_AFFICHAGE\n");
 	for(int i = 0; i < taille_liste; i++)
 	{
-		// printf("\t\t\t\t\tINDICE %d\n", i);
 		if (est_set_etats_egaux(etats, liste_set_etats[i])) return i;
 	}
 	return -1;
 }
 
-void set_etats_union(etats_non_determinises * etats1, etats_non_determinises * etats2) // fais l'union du set etats1, etats2 dans etats1
+/**
+ * @brief Fais l'union du set etats1, etats2 dans etats1
+ * 
+ * @param  etats1 le set ecrasé par le resultat de l'union des deux sets
+ * @param  etats2 un des deux sets
+ */
+void set_etats_union(etats_non_determinises * etats1, etats_non_determinises * etats2)
 {
 	bool etat_de_2_dans_1 = 0;
 	for(int i = 0; i < etats2->nombre_etats_non_determinises; i++)
@@ -147,13 +165,20 @@ void set_etats_union(etats_non_determinises * etats1, etats_non_determinises * e
 
 // fin fonctions outils
 
+/**
+ * @brief Determinise l' afn passé en parametre
+ * Algorithme Qui va retrouver tous les nouveaux états qui sont composé d'ensemble d'états de l'afn qu'on va stocker dans file et on les renomme directement dans l'afd.
+ * 
+ * @param  afn_a_determiniser l'afn à determiniser
+ * @return afd_a_renvoyer l afd determinisé
+ */
 afd determinisationAFN(afn * afn_a_determiniser)
 {
 	int nombre_max_etats = afn_a_determiniser->nombre_etats * afn_a_determiniser->alphabet.nombre_lettres+1;
 	afd afd_a_renvoyer = nouveauAFD(nombre_max_etats, &afn_a_determiniser->alphabet);
-	
+	// On créer la file qui est un tableau de pointeur sur structure.
 	etats_non_determinises * file[nombre_max_etats];
-
+	// on met le set d'état : {0, } dans la file.
 	etats_non_determinises etats_0;
 	etats_0.etats[0] = 0;
 	etats_0.nombre_etats_non_determinises = 1;
@@ -164,35 +189,32 @@ afd determinisationAFN(afn * afn_a_determiniser)
 	afd_a_renvoyer.nombre_etats = 1;
 	bool est_final;
 	int taille_file = 1, indice_parcours = 0, indice_dans_file;
-	
+	// On parcours la file indice par indice .. 
 	while (indice_parcours < taille_file)
 	{
 		est_final = 0;
 		for(int indice_lettre = 0; indice_lettre < afn_a_determiniser->alphabet.nombre_lettres; indice_lettre++)
 		{
-			if (file[indice_parcours]->nombre_etats_non_determinises == 0)
+			if (indice_parcours == indice_ensemble_vide) // à l'indice actuel il y a l'ensemble vide
 			{
-				for(int indice_lettre = 0; indice_lettre < afn_a_determiniser->alphabet.nombre_lettres; indice_lettre++)
-				{
-					afd_a_renvoyer.transitions[indice_parcours][indice_lettre] = indice_ensemble_vide;
-				}
+				afd_a_renvoyer.transitions[indice_parcours][indice_lettre] = indice_ensemble_vide; // pour chaque lettres on pointe la transition vers l'ensemble vide 
 			}
 			else 
 			{
-				etats_non_determinises * etats_transition;
-				etats_non_determinises * etats_totaux = malloc(sizeof(etats_non_determinises));
+				etats_non_determinises * etats_transition; // pour stocker les transitions trouvées dans l'afn avec cette lettre (indice_lettre) et a un état
+				etats_non_determinises * etats_totaux = malloc(sizeof(etats_non_determinises)); // pour stocker l'ensemble des transitions associé à cette lettre et à cet ensemble d'état
 				etats_totaux->nombre_etats_non_determinises = 0;
-				for (int j = 0; j < file[indice_parcours]->nombre_etats_non_determinises; j++)
+				for (int j = 0; j < file[indice_parcours]->nombre_etats_non_determinises; j++) // création etats_totaux
 				{
 					etat_actuel = file[indice_parcours]->etats[j];
 					etats_transition = &afn_a_determiniser->etats_transitions[etat_actuel][indice_lettre];
 					set_etats_union(etats_totaux, etats_transition);
-					if (afn_a_determiniser->sont_etats_finals[etat_actuel]) est_final = 1;
+					if (afn_a_determiniser->sont_etats_finals[etat_actuel]) est_final = 1; // l'ensemble d'états parcouru au moment par indice_parcours dans la file est final si un des état dedans est final
 				}
 				// Verification si etats_totaux est déjà dans file sinon on le rajoute
-				if (indice_ensemble_vide == -1 && etats_totaux->nombre_etats_non_determinises == 0) indice_ensemble_vide = taille_file;
-				indice_dans_file = indice_set_etats_dans_tableau(etats_totaux, file, taille_file);
-				if (indice_dans_file == -1)
+				if (indice_ensemble_vide == -1 && etats_totaux->nombre_etats_non_determinises == 0) indice_ensemble_vide = taille_file; // on note l'indice de l'ensemble vide si on le trouve
+				indice_dans_file = indice_set_etats_dans_tableau(etats_totaux, file, taille_file); // utilise la fonction qui determine à quel endroit dans la file un ensemble est renvoie l'indice ou -1
+				if (indice_dans_file == -1) // nouveau set -> taille de la file augmente + nouvel état dans l'afd
 				{
 					file[taille_file] = etats_totaux;
 					taille_file++;
@@ -203,15 +225,16 @@ afd determinisationAFN(afn * afn_a_determiniser)
 				else 
 				{
 					free(etats_totaux);
-					afd_a_renvoyer.transitions[indice_parcours][indice_lettre] = indice_dans_file;
+					afd_a_renvoyer.transitions[indice_parcours][indice_lettre] = indice_dans_file; // pas nouveau set mais on doit noter la transition dans l'afd vers l'indice qui correspond dans la file
 				}
 			}
 		}
-		afd_a_renvoyer.etats[indice_parcours] = est_final;
-		indice_parcours++;
+		afd_a_renvoyer.etats[indice_parcours] = est_final; // on note l'état comme final si est_final est vrai
+		indice_parcours++; // incrementation 
 	}
 	for (int i = 1; i < taille_file; i++)
 		free(file[i]);
+
 	return afd_a_renvoyer;
 }
 

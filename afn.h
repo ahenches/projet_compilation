@@ -15,6 +15,13 @@
 typedef char bool;
 
 
+/**
+ * @brief Structure de donnée représentant un alphabet fini
+ * nombre_lettres donne le nombre de lettres de l'alphabet
+ * lettre est un tableau de taille nombre_lettres qui contient les lettres
+ * correspondance est un tableau de taille 95 le nombre de caractère imprimable du code ascii il permet de donner directement à une lettre l'indice dans le tableau lettre
+ */
+typedef struct AFN {
 typedef struct Alphabet {
 	int nombre_lettres;
 	char *lettres;
@@ -22,6 +29,11 @@ typedef struct Alphabet {
 } alphabet;
 
 
+/**
+ * @brief Structure de donnée représentant une liste d'etats non determinisé ( appelé extensivement set par la suite ) 
+ * nombre_etats_non_determinises la taille de cette liste
+ * etats les états 
+ */
 typedef struct Etats_non_determinises {
 	int nombre_etats_non_determinises;
 	int etats[MAX_NOMBRE_ETATS_NON_DETERMINE];
@@ -32,10 +44,17 @@ int indice_set_etats_dans_tableau(etats_non_determinises * etats, etats_non_dete
 void set_etats_union(etats_non_determinises * etats1, etats_non_determinises * etats2); // fais l'union du set etats1, etats2 dans etats1
 
 
+/**
+ * @brief Structure de donnée représentant un automate fini non-deterministe
+ * nombre_etats represente le nombre total d etas de l afd 
+ * sont_etats_finaux est un tableau indexé par les etats de l automate, de taille nombre_etat, contenant des boolean, 1 si l état est terminal 0 sinon
+ * etat_transitions est un tableau 2D indexé par les etats de l automate et les caracteres de l'alphabet de l automate, il contient la structure recevant les multiples possible états d'arrivé possiblement vide
+ * alphabet est une structure comportant les caracteres de l'alphabet de l automate
+ */
 typedef struct AFN {
-	etats_non_determinises ** etats_transitions;
 	bool * sont_etats_finals;
 	int nombre_etats;
+	etats_non_determinises ** etats_transitions;
 	alphabet alphabet;
 } afn;
 
@@ -45,7 +64,7 @@ afn genererAFN(char *file_name);
 // fonctions outils qui servent à l'affichage
 
 void afficher_n_fois(char * str, int n_fois);
-int compter_digit(long long n);
+int compter_digit(int n);
 
 // fin fonctions outils
 

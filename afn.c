@@ -2,6 +2,12 @@
 
 //Auteur : Arnaud Henches
 
+/**
+ * @brief Génére un afn à partir d'un fichier
+ * 
+ * @param filename le nom du fichier
+ * @return afn1 l'afn nouvellement généré
+ */
 afn genererAFN(char *filename)
 {
 	
@@ -83,12 +89,24 @@ afn genererAFN(char *filename)
 
 // fonctions outils qui servent à l'affichage
 
+/**
+ * @brief Affiche une chaîne de caractère n_fois fois
+ * 
+ * @param str la chaine à afficher
+ * @param n_fois le nombre de fois
+ */
 void afficher_n_fois(char * str, int n_fois)
 {
 	for (int j = 0; j < n_fois; j++)
 		printf("%s", str);
 }
-int compter_digit(long long n)
+/**
+ * @brief Compte le nombre de chiffres
+ * 
+ * @param n le nombre
+ * @return le nombre de chiffre nécessaire à écrire l'entier
+ */
+int compter_digit(int n)
 {
 	if (n/10 == 0)
 		return 1;
@@ -96,6 +114,15 @@ int compter_digit(long long n)
 }
 // fin fonctions outils
 
+/**
+ * @brief Exécute l'AFN sur une chaine de caractère de manière récursive
+ * 
+ * @param etat_actuel l'état actuel dans la récursion
+ * @param chaine_restante la chaine de caractère qu'il reste à lire
+ * @param afn l'afn sur lequel on exécute la chaine
+ * @param taille_retrait la distance à la marge permet le bel affichage
+ * @return 1 si la chaine peut être lue par l'afn 0 sinon
+ */
 bool executer_AFN_rec(int etat_actuel, char chaine_restante[], afn *afn, int taille_retrait)
 {
 	printf("(%d, %s)", etat_actuel, chaine_restante);
